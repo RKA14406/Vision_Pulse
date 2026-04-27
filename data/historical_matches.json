@@ -1,0 +1,29 @@
+[
+  {
+    "id": "hist_001",
+    "eventCategory": "macro",
+    "assetSymbol": "GOLD",
+    "similarEvent": "Hot CPI surprise while USD/yields rose",
+    "reactionSummary": "Gold dropped first, then stabilized later in the session.",
+    "reactionRangePct": "0.8% - 1.7% intraday",
+    "similarityScore": 0.82
+  },
+  {
+    "id": "hist_002",
+    "eventCategory": "central_bank",
+    "assetSymbol": "BTC",
+    "similarEvent": "Fed statement interpreted as less hawkish than feared",
+    "reactionSummary": "BTC rallied as risk appetite improved.",
+    "reactionRangePct": "1.5% - 4.2% within 12 hours",
+    "similarityScore": 0.76
+  },
+  {
+    "id": "hist_003",
+    "eventCategory": "energy",
+    "assetSymbol": "OIL",
+    "similarEvent": "OPEC extended supply cuts",
+    "reactionSummary": "Oil moved higher, but gains faded when demand worries appeared.",
+    "reactionRangePct": "1.0% - 2.8% within 24 hours",
+    "similarityScore": 0.79
+  }
+]

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VisionPulse AI MVP</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <nav class="topbar">
+        <div class="brand">
+          <div class="logo-mark">VP</div>
+          <div>
+            <h1>VisionPulse AI</h1>
+            <p>AI-Powered Financial Market Intelligence MVP</p>
+          </div>
+        </div>
+        <div class="status-pill" id="backendStatus">Checking backend...</div>
+      </nav>
+
+      <section class="hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">Hackathon MVP</span>
+          <h2>Turn market-moving events into structured, explainable intelligence.</h2>
+          <p>
+            Test assets, event calendar, AI prediction cards, post-event reviews,
+            macro snapshots, news ingestion, and live/mock API fallback from one basic website.
+          </p>
+          <div class="actions">
+            <button id="reloadDashboardBtn">Reload Dashboard</button>
+            <button class="secondary" id="runTestsBtn">Run Endpoint Tests</button>
+          </div>
+        </div>
+
+        <div class="disclaimer-card">
+          <h3>Educational Disclaimer</h3>
+          <p>
+            VisionPulse AI is a decision-support and learning tool only. It does not provide
+            financial advice, buy/sell signals, or guaranteed predictions.
+          </p>
+          <div class="mini-metrics">
+            <div><strong id="assetCount">--</strong><span>Assets</span></div>
+            <div><strong id="eventCount">--</strong><span>Events</span></div>
+            <div><strong id="reviewAvg">--</strong><span>Avg Review</span></div>
+          </div>
+        </div>
+      </section>
+    </header>
+
+    <main>
+      <section class="section-header">
+        <div>
+          <span class="eyebrow">Market Layer</span>
+          <h2>Asset Watchlist</h2>
+        </div>
+        <button class="small-btn" id="refreshPricesBtn">Refresh Live/Mock Prices</button>
+      </section>
+      <div class="grid cards-grid" id="assetsGrid"></div>
+
+      <section class="section-header">
+        <div>
+          <span class="eyebrow">Event Intelligence</span>
+          <h2>Smart Event Calendar</h2>
+        </div>
+        <div class="filters">
+          <select id="assetFilter">
+            <option value="all">All assets</option>
+          </select>
+          <select id="categoryFilter">
+            <option value="all">All categories</option>
+            <option value="macro">Macro</option>
+            <option value="central_bank">Central Bank</option>
+            <option value="energy">Energy</option>
+            <option value="crypto">Crypto</option>
+            <option value="earnings">Earnings</option>
+            <option value="geopolitical">Geopolitical</option>
+          </select>
+        </div>
+      </section>
+      <div class="grid events-grid" id="eventsGrid"></div>
+
+      <section class="section-header">
+        <div>
+          <span class="eyebrow">AI Layer</span>
+          <h2>Prediction Generator</h2>
+        </div>
+      </section>
+      <div class="generator-panel">
+        <div class="form-row">
+          <label for="eventSelect">Event</label>
+          <select id="eventSelect"></select>
+        </div>
+        <div class="form-row">
+          <label for="assetSelect">Asset</label>
+          <select id="assetSelect"></select>
+        </div>
+        <button id="generatePredictionBtn">Generate AI / Rule Prediction</button>
+      </div>
+      <div class="grid prediction-grid" id="predictionsGrid"></div>
+
+      <section class="section-header">
+        <div>
+          <span class="eyebrow">Accountability Loop</span>
+          <h2>Post-Event Reviews</h2>
+        </div>
+      </section>
+      <div class="grid review-grid" id="reviewsGrid"></div>
+
+      <section class="section-header">
+        <div>
+          <span class="eyebrow">API Checks</span>
+          <h2>Testing Console</h2>
+        </div>
+      </section>
+      <div class="console" id="testConsole">Click “Run Endpoint Tests” to verify backend routes.</div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
