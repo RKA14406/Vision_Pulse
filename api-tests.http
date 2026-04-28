@@ -1,0 +1,68 @@
+### VisionPulse AI V4 endpoint smoke tests
+@base = http://localhost:5000/api
+
+### Health
+GET {{base}}/health
+
+### Fast API status
+GET {{base}}/ai/status
+
+### Provider probe
+GET {{base}}/ai/status?probe=true
+
+### Assets
+GET {{base}}/assets
+
+### Assets with quotes
+GET {{base}}/assets?live=true
+
+### Silver strict quote check
+GET {{base}}/market/quote/SILVER
+
+### Gold strict quote check
+GET {{base}}/market/quote/GOLD
+
+### Multi-asset quote check
+GET {{base}}/market/quotes?symbols=GOLD,SILVER,BTC,ETH,OIL,SPY,QQQ,NVDA
+
+### Combined Live News + Smart Event Calendar feed
+GET {{base}}/news?query=Trump%20speech%20Fed%20remarks%20CPI%20oil%20bitcoin%20gold%20market&pageSize=45
+
+### Calendar/data events
+GET {{base}}/events
+
+### Generate calendar prediction
+POST {{base}}/predictions/generate
+Content-Type: application/json
+
+{
+  "eventId": "evt_cpi_us_001",
+  "assetSymbol": "GOLD"
+}
+
+### Generate custom news prediction
+POST {{base}}/predictions/generate
+Content-Type: application/json
+
+{
+  "assetSymbol": "BTC",
+  "customEvent": {
+    "id": "custom_test_trump_speech_market_watch",
+    "title": "Trump speech / tariff comments market watch",
+    "description": "Political remarks can move USD, gold, stocks, oil, and crypto if tariff or foreign policy language surprises markets.",
+    "category": "geopolitical",
+    "importance": "medium",
+    "impactLevel": "medium",
+    "assetHints": ["GOLD", "SPY", "QQQ", "BTC"],
+    "affectedAssets": ["GOLD", "SPY", "QQQ", "BTC"],
+    "source": { "name": "VisionPulse test news" },
+    "publishedAt": "2026-04-28T20:00:00.000Z",
+    "eventTime": "2026-04-28T20:00:00.000Z"
+  }
+}
+
+### Reviews
+GET {{base}}/reviews
+
+### Review summary
+GET {{base}}/reviews/summary

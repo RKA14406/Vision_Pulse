@@ -1,0 +1,211 @@
+[
+  {
+    "symbol": "GOLD",
+    "displaySymbol": "XAU/USD",
+    "name": "Gold Spot",
+    "category": "Metals",
+    "region": "Global",
+    "exchange": "Precious metals spot",
+    "sensitivity": [
+      "CPI",
+      "FOMC",
+      "USD",
+      "Real yields",
+      "War risk"
+    ],
+    "mockPrice": 2328.4,
+    "mockChangePct": 0.42,
+    "sparkline": [
+      2310,
+      2316,
+      2308,
+      2322,
+      2330,
+      2328,
+      2334,
+      2328
+    ]
+  },
+  {
+    "symbol": "SILVER",
+    "displaySymbol": "XAG/USD",
+    "name": "Silver Spot",
+    "category": "Metals",
+    "region": "Global",
+    "exchange": "Precious metals spot",
+    "sensitivity": [
+      "CPI",
+      "Industrial demand",
+      "USD",
+      "Real yields"
+    ],
+    "mockPrice": 29.31,
+    "mockChangePct": 0.31,
+    "sparkline": [
+      28.9,
+      29,
+      28.8,
+      29.2,
+      29.35,
+      29.18,
+      29.4,
+      29.31
+    ]
+  },
+  {
+    "symbol": "BTC",
+    "displaySymbol": "BTC/USD",
+    "name": "Bitcoin",
+    "category": "Crypto",
+    "region": "Global",
+    "exchange": "Crypto",
+    "sensitivity": [
+      "ETF flows",
+      "Fed policy",
+      "Liquidity",
+      "Regulation"
+    ],
+    "mockPrice": 67380,
+    "mockChangePct": -0.85,
+    "sparkline": [
+      66800,
+      67100,
+      67600,
+      68050,
+      67420,
+      67280,
+      66990,
+      67380
+    ]
+  },
+  {
+    "symbol": "ETH",
+    "displaySymbol": "ETH/USD",
+    "name": "Ethereum",
+    "category": "Crypto",
+    "region": "Global",
+    "exchange": "Crypto",
+    "sensitivity": [
+      "ETF news",
+      "Risk appetite",
+      "Network upgrades",
+      "Regulation"
+    ],
+    "mockPrice": 3510,
+    "mockChangePct": -0.43,
+    "sparkline": [
+      3480,
+      3495,
+      3530,
+      3550,
+      3514,
+      3502,
+      3490,
+      3510
+    ]
+  },
+  {
+    "symbol": "OIL",
+    "displaySymbol": "WTI / USO",
+    "name": "Oil",
+    "category": "Energy",
+    "region": "Global",
+    "exchange": "Commodity / ETF proxy",
+    "sensitivity": [
+      "OPEC",
+      "EIA inventories",
+      "Sanctions",
+      "Middle East risk"
+    ],
+    "mockPrice": 81.2,
+    "mockChangePct": 1.15,
+    "sparkline": [
+      79.9,
+      80.1,
+      80.6,
+      80.8,
+      81.4,
+      81.1,
+      81.8,
+      81.2
+    ]
+  },
+  {
+    "symbol": "SPY",
+    "displaySymbol": "SPY",
+    "name": "S&P 500 ETF",
+    "category": "ETF",
+    "region": "US",
+    "exchange": "NYSE Arca",
+    "sensitivity": [
+      "FOMC",
+      "CPI",
+      "GDP",
+      "Earnings breadth"
+    ],
+    "mockPrice": 528.3,
+    "mockChangePct": 0.22,
+    "sparkline": [
+      525,
+      526.2,
+      527.1,
+      526.9,
+      528.4,
+      529,
+      528.1,
+      528.3
+    ]
+  },
+  {
+    "symbol": "QQQ",
+    "displaySymbol": "QQQ",
+    "name": "Nasdaq 100 ETF",
+    "category": "ETF",
+    "region": "US",
+    "exchange": "Nasdaq",
+    "sensitivity": [
+      "Rates",
+      "AI cycle",
+      "Mega-cap earnings",
+      "Risk sentiment"
+    ],
+    "mockPrice": 457.9,
+    "mockChangePct": 0.38,
+    "sparkline": [
+      452,
+      453.5,
+      455,
+      456.2,
+      458,
+      459.1,
+      457.2,
+      457.9
+    ]
+  },
+  {
+    "symbol": "NVDA",
+    "displaySymbol": "NVDA",
+    "name": "Nvidia",
+    "category": "Stock",
+    "region": "US",
+    "exchange": "Nasdaq",
+    "sensitivity": [
+      "Earnings",
+      "AI demand",
+      "Semiconductor policy",
+      "China exports"
+    ],
+    "mockPrice": 924.6,
+    "mockChangePct": 1.92,
+    "sparkline": [
+      895,
+      902,
+      910,
+      918,
+      930,
+      926,
+      922,
+      924.6
+    ]
+  }
+]

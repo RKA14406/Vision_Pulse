@@ -1,0 +1,47 @@
+[
+  {
+    "id": "pred_001",
+    "eventId": "evt_cpi_us_001",
+    "assetSymbol": "GOLD",
+    "label": "volatile",
+    "confidence": 72,
+    "volatility": "high",
+    "summary": "Gold may react strongly because CPI can shift real-yield and USD expectations.",
+    "reasoning": [
+      "Hot CPI can support higher-for-longer rate expectations, usually pressuring non-yielding assets like gold.",
+      "Cold CPI can weaken rate expectations and support gold if USD/yields fall.",
+      "The safest MVP label is volatility because direction depends on the surprise versus forecast."
+    ],
+    "riskWarning": "Do not treat this as a buy/sell signal. Wait for actual data and risk controls."
+  },
+  {
+    "id": "pred_002",
+    "eventId": "evt_fomc_001",
+    "assetSymbol": "BTC",
+    "label": "volatile",
+    "confidence": 76,
+    "volatility": "high",
+    "summary": "Bitcoin may react to liquidity expectations and risk appetite after the Fed decision.",
+    "reasoning": [
+      "Dovish language can improve risk appetite and liquidity expectations.",
+      "Hawkish language can pressure risk assets through stronger yields and USD.",
+      "Crypto often reacts sharply around central bank communication."
+    ],
+    "riskWarning": "Educational market intelligence only. Crypto volatility can be extreme."
+  },
+  {
+    "id": "pred_003",
+    "eventId": "evt_opec_001",
+    "assetSymbol": "OIL",
+    "label": "bullish_or_bearish_depending_on_surprise",
+    "confidence": 70,
+    "volatility": "high",
+    "summary": "Oil direction depends on whether OPEC signals tighter or looser supply than expected.",
+    "reasoning": [
+      "Production cuts or extended cuts usually support oil prices.",
+      "Unexpected supply increases or weak demand commentary can pressure oil.",
+      "Inventory and demand context can change the final reaction."
+    ],
+    "riskWarning": "Energy headlines can reverse quickly when details are clarified."
+  }
+]
