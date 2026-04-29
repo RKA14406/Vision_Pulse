@@ -1,47 +1,57 @@
 [
   {
-    "id": "pred_001",
+    "id": "pred_rule_1777468102815",
     "eventId": "evt_cpi_us_001",
-    "assetSymbol": "GOLD",
-    "label": "volatile",
-    "confidence": 72,
-    "volatility": "high",
-    "summary": "Gold may react strongly because CPI can shift real-yield and USD expectations.",
-    "reasoning": [
-      "Hot CPI can support higher-for-longer rate expectations, usually pressuring non-yielding assets like gold.",
-      "Cold CPI can weaken rate expectations and support gold if USD/yields fall.",
-      "The safest MVP label is volatility because direction depends on the surprise versus forecast."
-    ],
-    "riskWarning": "Do not treat this as a buy/sell signal. Wait for actual data and risk controls."
+    "asset": "GOLD",
+    "prediction": "Gold Spot: bearish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.78,
+    "direction": "bearish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T13:08:22.815Z"
   },
   {
-    "id": "pred_002",
-    "eventId": "evt_fomc_001",
-    "assetSymbol": "BTC",
-    "label": "volatile",
-    "confidence": 76,
-    "volatility": "high",
-    "summary": "Bitcoin may react to liquidity expectations and risk appetite after the Fed decision.",
-    "reasoning": [
-      "Dovish language can improve risk appetite and liquidity expectations.",
-      "Hawkish language can pressure risk assets through stronger yields and USD.",
-      "Crypto often reacts sharply around central bank communication."
-    ],
-    "riskWarning": "Educational market intelligence only. Crypto volatility can be extreme."
-  },
-  {
-    "id": "pred_003",
+    "id": "pred_rule_1777468107058",
     "eventId": "evt_opec_001",
-    "assetSymbol": "OIL",
-    "label": "bullish_or_bearish_depending_on_surprise",
-    "confidence": 70,
-    "volatility": "high",
-    "summary": "Oil direction depends on whether OPEC signals tighter or looser supply than expected.",
-    "reasoning": [
-      "Production cuts or extended cuts usually support oil prices.",
-      "Unexpected supply increases or weak demand commentary can pressure oil.",
-      "Inventory and demand context can change the final reaction."
-    ],
-    "riskWarning": "Energy headlines can reverse quickly when details are clarified."
+    "asset": "GOLD",
+    "prediction": "Gold Spot: bearish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.78,
+    "direction": "bearish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T13:08:27.058Z"
+  },
+  {
+    "id": "pred_rule_1777468128952",
+    "eventId": "evt_opec_001",
+    "asset": "NVDA",
+    "prediction": "Nvidia: bearish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.72,
+    "direction": "bearish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T13:08:48.952Z"
+  },
+  {
+    "id": "pred_rule_1777468131377",
+    "eventId": "evt_nvda_earnings_001",
+    "asset": "NVDA",
+    "prediction": "Nvidia: bullish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.68,
+    "direction": "bullish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T13:08:51.377Z"
+  },
+  {
+    "id": "pred_rule_1777468135161",
+    "eventId": "live_uae_announces_intention_to_leave_opec_oil_cartel_141458137",
+    "asset": "NVDA",
+    "prediction": "Nvidia: bullish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.66,
+    "direction": "bullish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T13:08:55.161Z"
   }
 ]

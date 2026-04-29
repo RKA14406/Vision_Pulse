@@ -1,4 +1,4 @@
-import { buildMainPrediction, classifyImpact } from "../utils/impactRules.js";
+import { classifyImpact } from "../utils/impactRules.js";
 import { askGemini } from "./gemini.service.js";
 import { findHistoricalMatches } from "./historical.service.js";
 
@@ -61,39 +61,31 @@ function clamp(value, min, max) {
   return Math.min(max, Math.max(min, number));
 }
 
-function normalizeRiskLevel(value, fallback = "Watch") {
-  const text = String(value || "").toLowerCase();
-  if (text.includes("safe") || text.includes("low")) return "Safe";
-  if (text.includes("risk") || text.includes("high") || text.includes("critical")) return "Risky";
-  if (text.includes("watch") || text.includes("medium")) return "Watch";
-  return fallback;
+function resolveDirection(label, ruleDirection, expectedMovePct) {
+  const l = String(label || "").toLowerCase();
+  const d = String(ruleDirection || "").toLowerCase();
+  if (l.includes("bearish") || d === "bearish" || d === "down") return "bearish";
+  if (l.includes("bullish") || d === "bullish" || d === "up") return "bullish";
+  return Number(expectedMovePct) >= 0 ? "bullish" : "bearish";
 }
 
-function normalizePredictionPayload({ event, asset, source, parsed = {}, ruleImpact, historicalMatches, aiNote }) {
-  const confidence = Math.round(clamp(parsed.confidence ?? ruleImpact.confidence, 0, 100));
+function normalizePredictionPayload({ event, asset, source, parsed = {}, ruleImpact, historicalMatches }) {
+  const rawConfidence = clamp(parsed.confidence ?? ruleImpact.confidence, 0, 100);
+  const confidence = parseFloat((rawConfidence / 100).toFixed(4));
   const expectedMovePct = Number(clamp(parsed.expectedMovePct ?? ruleImpact.expectedMovePct, -12, 12).toFixed(2));
-  const riskLevel = normalizeRiskLevel(parsed.riskLevel, ruleImpact.riskLevel);
-  const mainPrediction = buildMainPrediction(asset.symbol, expectedMovePct, riskLevel, confidence);
+  const direction = resolveDirection(parsed.label || ruleImpact.label, ruleImpact.direction, expectedMovePct);
+  const summary = parsed.summary || `${asset.name}: ${direction} bias. Depends on surprise, liquidity, and market context.`;
 
   return {
-    source,
     id: `${source.includes("gemini") ? "pred_live" : "pred_rule"}_${Date.now()}`,
     eventId: event.id,
-    assetSymbol: asset.symbol,
-    label: parsed.label || ruleImpact.label,
+    asset: asset.symbol,
+    prediction: summary,
     confidence,
-    volatility: parsed.volatility || ruleImpact.volatility,
-    expectedMovePct: mainPrediction.expectedMovePct,
-    riskLevel: mainPrediction.riskLevel,
-    direction: mainPrediction.direction,
-    mainPrediction,
-    summary: parsed.summary || `${asset.name}: ${mainPrediction.text}. Depends on surprise, liquidity, and market context.`,
-    reasoning: Array.isArray(parsed.reasoning) ? parsed.reasoning.slice(0, 2) : ruleImpact.reasons.slice(0, 2),
-    historicalComparison: parsed.historicalComparison || historicalMatches[0]?.reactionSummary || "No strong historical match found in seeded MVP data.",
-    riskWarning: parsed.riskWarning || "Educational only. Not financial advice. Not a buy/sell signal.",
-    historicalMatches,
-    generatedAt: new Date().toISOString(),
-    aiNote
+    direction,
+    status: "pending",
+    source,
+    createdAt: new Date().toISOString()
   };
 }
 
@@ -121,7 +113,6 @@ export async function generatePrediction({ event, asset }) {
     source: gemini.source || "rules_only",
     parsed: {},
     ruleImpact,
-    historicalMatches,
-    aiNote: gemini.text
+    historicalMatches
   });
 }

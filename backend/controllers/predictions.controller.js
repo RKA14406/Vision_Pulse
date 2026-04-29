@@ -1,4 +1,4 @@
-import { getAssets, getEvents, getPredictions } from "../services/dataStore.service.js";
+import { getAssets, getEvents, getPredictions, savePrediction } from "../services/dataStore.service.js";
 import { generatePrediction } from "../services/prediction.service.js";
 
 function normalizeCustomEvent(customEvent = {}, assetSymbol = "") {
@@ -38,9 +38,10 @@ export async function listPredictions(req, res) {
     }
 
     if (asset && asset !== "all") {
-      predictions = predictions.filter((prediction) => prediction.assetSymbol === String(asset).toUpperCase());
+      predictions = predictions.filter((prediction) => prediction.asset === String(asset).toUpperCase());
     }
 
+    predictions = predictions.slice(-10).reverse();
     res.json({ success: true, count: predictions.length, data: predictions });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to load predictions", error: error.message });
@@ -82,8 +83,9 @@ export async function createPrediction(req, res) {
     }
 
     const prediction = await generatePrediction({ event, asset });
+    const saved = await savePrediction(prediction);
 
-    res.json({ success: true, data: prediction });
+    res.json({ success: true, data: saved });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to generate prediction", error: error.message });
   }
