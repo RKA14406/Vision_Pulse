@@ -24,6 +24,7 @@ export function normalizePrediction(raw) {
 
   const label = String(raw.label || "").toLowerCase();
   const rawDir = String(raw.direction || "").toLowerCase();
+
   let direction;
   if (label.includes("bearish") || rawDir === "bearish" || rawDir === "down") {
     direction = "bearish";
@@ -37,7 +38,12 @@ export function normalizePrediction(raw) {
   return {
     id: String(raw.id || `pred_${Date.now()}`),
     eventId: String(raw.eventId || ""),
-    asset: String(raw.asset || raw.assetSymbol || raw.mainPrediction?.assetSymbol || "UNKNOWN").toUpperCase(),
+    asset: String(
+      raw.asset ||
+      raw.assetSymbol ||
+      raw.mainPrediction?.assetSymbol ||
+      "UNKNOWN"
+    ).toUpperCase(),
     prediction: String(raw.prediction || raw.summary || ""),
     confidence,
     direction,
@@ -80,14 +86,12 @@ export async function savePrediction(rawPrediction) {
     (now - new Date(p.createdAt).getTime()) < 60000
   );
 
-  if (exists) {
-    return exists; // skip duplicate
-  }
+  if (exists) return exists;
 
   // ➕ Add new prediction
   predictions.push(normalized);
 
-  // 🧹 Keep only last 100 predictions (MVP safety)
+  // 🧹 Keep only last 100 predictions
   if (predictions.length > 100) {
     predictions = predictions.slice(-100);
   }
