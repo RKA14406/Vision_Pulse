@@ -1,4 +1,4 @@
-const API_BASE = "/api";
+const API_BASE = "http://localhost:5000/api";
 
 const state = {
   assets: [],
@@ -46,12 +46,41 @@ const els = {
   reloadDashboardBtn: document.querySelector("#reloadDashboardBtn"),
   runTestsBtn: document.querySelector("#runTestsBtn"),
   refreshPricesBtn: document.querySelector("#refreshPricesBtn"),
-  generatePredictionBtn: document.querySelector("#generatePredictionBtn")
+  generatePredictionBtn: document.querySelector("#generatePredictionBtn"),
+  feedList: document.querySelector("#feedList")
 };
+
+const DEV_MODE = new URLSearchParams(location.search).get("dev") === "1";
+let feedFilter = "all";
+
+if (DEV_MODE) {
+  const devPanel = document.querySelector("#devPanel");
+  if (devPanel) devPanel.style.display = "";
+}
+
+function switchTab(tabName) {
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.tab === tabName);
+  });
+  document.querySelectorAll(".tab-panel").forEach(panel => {
+    panel.classList.toggle("active", panel.dataset.panel === tabName);
+  });
+  if (tabName === "watch") setTimeout(() => renderChart(), 50);
+}
+
+async function safeJson(response, label) {
+  const text = await response.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    console.error(`Non-JSON response from ${label}:`, text.slice(0, 200));
+    throw new Error(`API returned non-JSON response for ${label}`);
+  }
+}
 
 async function apiGet(path) {
   const response = await fetch(`${API_BASE}${path}`);
-  const data = await response.json();
+  const data = await safeJson(response, path);
   if (!response.ok || data.success === false) {
     throw new Error(data.message || `GET ${path} failed`);
   }
@@ -64,7 +93,7 @@ async function apiPost(path, payload) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   });
-  const data = await response.json();
+  const data = await safeJson(response, path);
   if (!response.ok || data.success === false) {
     throw new Error(data.message || `POST ${path} failed`);
   }
@@ -465,8 +494,11 @@ function renderMarketFeed() {
         els.chartAssetSelect.value = firstAsset;
       }
       clearSelectedPrediction();
-      renderChart();
-      document.querySelector(".generator-panel")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      switchTab("predict");
+      const gc = document.querySelector("#generatorCard");
+      gc?.classList.remove("pulse");
+      void gc?.offsetWidth;
+      gc?.classList.add("pulse");
     });
   });
 
@@ -483,10 +515,83 @@ function renderNews(data = {}) {
 
   renderFilters();
   renderMarketFeed();
+  renderFeedList(feedFilter);
   renderChart();
   renderReviews();
 }
 
+function renderFeedList(filterType = "all") {
+  if (!els.feedList) return;
+  const all = combinedFeedArticles();
+  const now = Date.now();
+
+  let filtered = all;
+  if (filterType === "future") {
+    filtered = all.filter(a => articleDateValue(a).getTime() > now || a.isUpcoming);
+  } else if (filterType === "past") {
+    filtered = all.filter(a => articleDateValue(a).getTime() <= now && !a.isUpcoming);
+  }
+
+  if (!filtered.length) {
+    els.feedList.innerHTML = `<div class="feed-empty">No items match this filter.</div>`;
+    return;
+  }
+
+  els.feedList.innerHTML = filtered.slice(0, 80).map(article => {
+    const level = article.impactLevel || article.importance || "low";
+    const klass = newsImpactClass(level);
+    const isFuture = articleDateValue(article).getTime() > now || article.isUpcoming || article.status === "upcoming";
+    const isCalendar = Boolean(article.isCalendarEvent);
+    const assets = assetHintsForArticle(article);
+    const optionEvent = newsToPredictionEvent(article);
+    const dateText = formatTime(article.eventTime || article.publishedAt);
+    const badgeKlass = isFuture ? "future-badge" : klass;
+
+    return `
+      <div class="feed-row ${klass}" data-news-option-id="${escapeHtml(optionEvent.optionId)}" data-news-first-asset="${escapeHtml(assets[0] || "")}">
+        <span class="feed-dot ${klass}"></span>
+        <div class="feed-row-content">
+          <div class="feed-row-title">${escapeHtml(compact(article.title, 68))}</div>
+          <div class="feed-row-meta">${escapeHtml(isCalendar ? "Calendar" : "News")} · ${escapeHtml(dateText)}${assets.length ? ` · ${assets.slice(0, 3).join(", ")}` : ""}</div>
+        </div>
+        <span class="feed-row-badge ${badgeKlass}">${escapeHtml(isFuture ? "Soon" : "Past")}</span>
+        <button class="feed-use-btn" type="button" data-news-option-id="${escapeHtml(optionEvent.optionId)}" data-news-first-asset="${escapeHtml(assets[0] || "")}">Use →</button>
+      </div>
+    `;
+  }).join("");
+
+  els.feedList.querySelectorAll(".feed-row").forEach(row => {
+    row.addEventListener("click", (e) => {
+      if (e.target.closest(".feed-use-btn")) return;
+      const optionId = row.dataset.newsOptionId;
+      const firstAsset = row.dataset.newsFirstAsset;
+      if (optionId && els.eventSelect) els.eventSelect.value = optionId;
+      if (firstAsset && state.assets.some(a => a.symbol === firstAsset) && els.assetSelect) {
+        els.assetSelect.value = firstAsset;
+      }
+      clearSelectedPrediction();
+    });
+  });
+
+  els.feedList.querySelectorAll(".feed-use-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const optionId = btn.dataset.newsOptionId;
+      const firstAsset = btn.dataset.newsFirstAsset;
+      if (optionId && els.eventSelect) els.eventSelect.value = optionId;
+      if (firstAsset && state.assets.some(a => a.symbol === firstAsset)) {
+        if (els.assetSelect) els.assetSelect.value = firstAsset;
+        state.selectedChartSymbol = firstAsset;
+        if (els.chartAssetSelect) els.chartAssetSelect.value = firstAsset;
+      }
+      clearSelectedPrediction();
+      const gc = document.querySelector("#generatorCard");
+      gc?.classList.remove("pulse");
+      void gc?.offsetWidth;
+      gc?.classList.add("pulse");
+    });
+  });
+}
 
 async function loadNews() {
   if (!els.newsGrid) return;
@@ -555,7 +660,7 @@ function renderAssets() {
     });
   });
 
-  els.assetCount.textContent = state.assets.length;
+  if (els.assetCount) els.assetCount.textContent = state.assets.length;
 }
 
 function renderFilters() {
@@ -628,6 +733,7 @@ function renderFilters() {
 function renderEvents() {
   if (els.eventCount) els.eventCount.textContent = state.events.length;
   renderMarketFeed();
+  renderFeedList(feedFilter);
 }
 
 
@@ -898,24 +1004,26 @@ function renderChart() {
 function selectChartAsset(symbol) {
   state.selectedChartSymbol = symbol;
   els.chartAssetSelect.value = symbol;
-  renderChart();
-  document.querySelector(".chart-panel")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  switchTab("watch");
+  setTimeout(() => {
+    renderChart();
+    document.querySelector(".chart-panel")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, 50);
 }
 
 function predictionMain(prediction) {
-  const confidence = Math.round(Number(prediction.mainPrediction?.confidence ?? prediction.confidence ?? 0));
-  const expectedMovePct = Number(prediction.mainPrediction?.expectedMovePct ?? prediction.expectedMovePct ?? 0);
-  const riskLevel = prediction.mainPrediction?.riskLevel || prediction.riskLevel || "Watch";
-  const assetSymbol = prediction.mainPrediction?.assetSymbol || prediction.assetSymbol || "ASSET";
+  const rawConf = Number(prediction.confidence ?? 0);
+  const confidence = Math.round(rawConf > 1 ? rawConf : rawConf * 100);
+  const isBullish = String(prediction.direction || "bullish").toLowerCase() !== "bearish";
+  const asset = prediction.asset || prediction.assetSymbol || "ASSET";
 
   return {
     confidence,
-    expectedMovePct,
-    riskLevel,
-    assetSymbol,
-    moveText: pct(expectedMovePct),
-    directionClass: expectedMovePct >= 0 ? "positive" : "negative",
-    text: prediction.mainPrediction?.text || `${assetSymbol}: ${pct(expectedMovePct)}, ${riskLevel}, ${confidence}% sure`
+    asset,
+    isBullish,
+    directionClass: isBullish ? "positive" : "negative",
+    directionLabel: isBullish ? "Bullish" : "Bearish",
+    text: prediction.prediction || prediction.summary || `${asset}: ${isBullish ? "bullish" : "bearish"} bias, ${confidence}% confident`
   };
 }
 
@@ -953,63 +1061,56 @@ function directionLabel(move) {
 }
 
 function renderPredictions(prediction = null) {
-  const predictions = prediction ? [prediction] : [];
+  // 🔒 ALWAYS fallback to state if available
+  if (!prediction && state.selectedPrediction) {
+    prediction = state.selectedPrediction;
+  }
 
-  if (!predictions.length) {
+  // ❗ ONLY show placeholder if NOTHING exists at all
+  if (!prediction) {
     selectedPredictionPlaceholder();
     return;
   }
 
-  els.predictionsGrid.innerHTML = predictions.map((prediction) => {
-    const main = predictionMain(prediction);
-    const eventTitle = getEventTitle(prediction.eventId);
-    const sourceLabel = userFacingPredictionSource(prediction.source);
-    const reasons = Array.isArray(prediction.reasoning) ? prediction.reasoning.slice(0, 2) : [];
-    const history = compact(prediction.historicalComparison || "No strong historical match in seeded MVP data.", 110);
+  const main = predictionMain(prediction);
+  const eventTitle = getEventTitle(prediction.eventId);
+  const sourceLabel = userFacingPredictionSource(prediction.source);
+  const dirClass = main.isBullish ? "bullish" : "bearish";
 
-    return `
-      <article class="card prediction-card selected-result-card compact-prediction-card">
-        <div class="prediction-headline">
-          <div>
-            <span class="eyebrow">Focused Prediction</span>
-            <h3>${escapeHtml(main.assetSymbol)} → ${escapeHtml(eventTitle)}</h3>
-          </div>
-          <span class="badge ${sourceChipClass(prediction.source)}">${escapeHtml(sourceLabel)}</span>
+  els.predictionsGrid.innerHTML = `
+    <article class="card prediction-card selected-result-card compact-prediction-card ${dirClass}">
+      <div class="prediction-headline">
+        <div>
+          <span class="eyebrow">Focused Prediction</span>
+          <h3>${escapeHtml(main.asset)} → ${escapeHtml(eventTitle)}</h3>
         </div>
+        <span class="badge ${sourceChipClass(prediction.source)}">${escapeHtml(sourceLabel)}</span>
+      </div>
 
-        <div class="prediction-scoreboard">
-          <div class="prediction-big ${main.directionClass}">
-            <span>Expected move</span>
-            <strong>${escapeHtml(main.moveText)}</strong>
-          </div>
-          <div><span>Direction</span><strong>${escapeHtml(directionLabel(main.expectedMovePct))}</strong></div>
-          <div><span>Risk</span><strong>${escapeHtml(main.riskLevel)}</strong></div>
-          <div><span>Confidence</span><strong>${escapeHtml(main.confidence)}%</strong></div>
+      <div class="prediction-scoreboard">
+        <div class="prediction-big ${main.directionClass}">
+          <span>Direction</span>
+          <strong>${escapeHtml(main.directionLabel)}</strong>
         </div>
+        <div><span>Confidence</span><strong>${escapeHtml(String(main.confidence))}%</strong></div>
+        <div><span>Status</span><strong>${escapeHtml(prediction.status || "pending")}</strong></div>
+      </div>
 
-        <div class="prediction-quick-grid">
-          <div>
-            <h4>Why it matters</h4>
-            <ul>
-              ${(reasons.length ? reasons : [prediction.summary || "Market reaction depends on surprise and liquidity."]).map((reason) => `<li>${escapeHtml(compact(reason, 115))}</li>`).join("")}
-            </ul>
-          </div>
-          <div>
-            <h4>History</h4>
-            <p>${escapeHtml(history)}</p>
-            <div class="meta-list prediction-tags">
-              <span>${escapeHtml(prediction.label || "uncertain")}</span>
-              <span>${escapeHtml(prediction.volatility || "medium")} volatility</span>
-            </div>
+      <div class="prediction-quick-grid">
+        <div>
+          <h4>Intelligence summary</h4>
+          <p>${escapeHtml(compact(prediction.prediction || prediction.summary || "Market reaction depends on surprise and liquidity.", 220))}</p>
+          <div class="meta-list prediction-tags">
+            <span>${escapeHtml(main.directionLabel)}</span>
+            <span>${escapeHtml(prediction.status || "pending")}</span>
           </div>
         </div>
+      </div>
 
-        <div class="prediction-disclaimer">Educational only. Not financial advice. Not a buy/sell signal.</div>
-      </article>
-    `;
-  }).join("");
+      <div class="prediction-disclaimer">Educational only. Not financial advice.</div>
+    </article>
+  `;
 }
-
 function clearSelectedPrediction() {
   state.selectedPrediction = null;
   renderPredictions(null);
@@ -1082,7 +1183,7 @@ function renderReviews() {
         <p>Past calendar/news items will appear here with MVP accuracy scores.</p>
       </article>
     `;
-    els.reviewAvg.textContent = "--";
+    if (els.reviewAvg) els.reviewAvg.textContent = "--";
     return;
   }
 
@@ -1108,7 +1209,7 @@ function renderReviews() {
   const average = reviews.length
     ? Math.round(reviews.reduce((sum, item) => sum + Number(item.accuracyPct || 0), 0) / reviews.length)
     : 0;
-  els.reviewAvg.textContent = `${average}%`;
+  if (els.reviewAvg) els.reviewAvg.textContent = `${average}%`;
 }
 
 async function checkBackend() {
@@ -1140,9 +1241,26 @@ async function loadDashboard() {
     renderFilters();
     renderAssets();
     renderEvents();
-    renderPredictions();
+
+    // --- THE FIX ---
+    // 1. Check if we have a saved prediction from the last session
+    const cached = localStorage.getItem("vp_selected_prediction");
+    const savedPrediction = cached ? JSON.parse(cached) : null;
+
+    // 2. Fallback chain: LocalStorage -> Latest from DB -> Null
+    state.selectedPrediction = savedPrediction || (state.predictions.length > 0 ? state.predictions[0] : null);
+
+    // 3. Render accordingly
+    if (state.selectedPrediction) {
+      renderPredictions(state.selectedPrediction);
+    } else {
+      selectedPredictionPlaceholder();
+    }
+    // ---------------
+
     renderReviews();
     renderChart();
+    renderFeedList(feedFilter);
   } catch (error) {
     els.testConsole.textContent = `Dashboard load failed: ${error.message}`;
   } finally {
@@ -1172,8 +1290,24 @@ async function refreshPrices() {
 async function generatePredictionCard() {
   const selectedOptionId = els.eventSelect.value;
   const assetSymbol = els.assetSelect.value;
+
+  console.log("Selected event ID:", selectedOptionId);
+  console.log("Selected asset:", assetSymbol);
+
+  if (!assetSymbol || !selectedOptionId) {
+    els.predictionsGrid.innerHTML = `
+      <article class="card prediction-card">
+        <span class="badge bad">Missing input</span>
+        <h3>Select an event and asset first</h3>
+        <p>Use the dropdowns above or click "Use →" on any item in the Market Intelligence feed.</p>
+      </article>
+    `;
+    return;
+  }
+
   const selectedEvent = getSelectableEvent(selectedOptionId);
   els.generatePredictionBtn.textContent = "Generating...";
+  els.generatePredictionBtn.disabled = true;
 
   try {
     const payload = selectedEvent?.isVirtualNews
@@ -1187,19 +1321,34 @@ async function generatePredictionCard() {
       }
       : { eventId: selectedEvent?.id || selectedOptionId, assetSymbol };
 
+    console.log("Sending payload:", payload);
     const result = await apiPost("/predictions/generate", payload);
+    console.log("Prediction result:", result.data);
+
     state.selectedPrediction = result.data;
-    state.selectedChartSymbol = result.data.assetSymbol;
-    els.chartAssetSelect.value = result.data.assetSymbol;
+    localStorage.setItem("vp_selected_prediction", JSON.stringify(result.data));
+    state.selectedChartSymbol = result.data.asset;
+    if (els.chartAssetSelect) els.chartAssetSelect.value = result.data.asset;
     renderPredictions(state.selectedPrediction);
     renderChart();
-    const main = predictionMain(result.data);
-    const eventTitle = getEventTitle(result.data.eventId) || selectedEvent?.title;
-    els.testConsole.textContent = `Generated focused prediction: ${eventTitle} → ${main.text}\nSource event: ${selectedEvent?.isVirtualNews ? "Live/Small News" : "Calendar"}\n\n${JSON.stringify(result.data, null, 2)}`;
+    if (DEV_MODE && els.testConsole) {
+      const main = predictionMain(result.data);
+      const eventTitle = getEventTitle(result.data.eventId) || selectedEvent?.title;
+      els.testConsole.textContent = `Generated: ${eventTitle} → ${main.text}\n\n${JSON.stringify(result.data, null, 2)}`;
+    }
   } catch (error) {
-    els.testConsole.textContent = `Prediction failed: ${error.message}`;
+    console.error("Prediction failed:", error.message);
+    els.predictionsGrid.innerHTML = `
+      <article class="card prediction-card">
+        <span class="badge bad">Failed</span>
+        <h3>Prediction failed</h3>
+        <p>${escapeHtml(error.message)}</p>
+      </article>
+    `;
+    if (DEV_MODE && els.testConsole) els.testConsole.textContent = `Prediction failed: ${error.message}`;
   } finally {
-    els.generatePredictionBtn.textContent = "Generate Main Prediction";
+    els.generatePredictionBtn.textContent = "Generate Prediction";
+    els.generatePredictionBtn.disabled = false;
   }
 }
 
@@ -1250,6 +1399,19 @@ async function runEndpointTests() {
   els.testConsole.textContent = lines.join("\n");
 }
 
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+});
+
+document.querySelectorAll(".pill-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    feedFilter = btn.dataset.filter;
+    document.querySelectorAll(".pill-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderFeedList(feedFilter);
+  });
+});
+
 els.reloadDashboardBtn.addEventListener("click", () => {
   checkBackend();
   loadApiStatus(false);
@@ -1268,8 +1430,13 @@ els.generatePredictionBtn.addEventListener("click", generatePredictionCard);
 els.assetFilter.addEventListener("change", renderMarketFeed);
 els.categoryFilter.addEventListener("change", renderMarketFeed);
 els.feedTypeFilter?.addEventListener("change", renderMarketFeed);
-els.eventSelect.addEventListener("change", clearSelectedPrediction);
-els.assetSelect.addEventListener("change", clearSelectedPrediction);
+els.eventSelect.addEventListener("change", () => {
+  if (state.selectedPrediction) clearSelectedPrediction();
+});
+
+els.assetSelect.addEventListener("change", () => {
+  if (state.selectedPrediction) clearSelectedPrediction();
+});
 els.chartAssetSelect.addEventListener("change", (event) => selectChartAsset(event.target.value));
 window.addEventListener("resize", () => renderChart());
 
