@@ -1,50 +1,6 @@
 [
   {
-    "id": "pred_rule_1777468102815",
-    "eventId": "evt_cpi_us_001",
-    "asset": "GOLD",
-    "prediction": "Gold Spot: bearish bias. Depends on surprise, liquidity, and market context.",
-    "confidence": 0.78,
-    "direction": "bearish",
-    "status": "pending",
-    "source": "fallback_rules_after_ai_error",
-    "createdAt": "2026-04-29T13:08:22.815Z"
-  },
-  {
-    "id": "pred_rule_1777468107058",
-    "eventId": "evt_opec_001",
-    "asset": "GOLD",
-    "prediction": "Gold Spot: bearish bias. Depends on surprise, liquidity, and market context.",
-    "confidence": 0.78,
-    "direction": "bearish",
-    "status": "pending",
-    "source": "fallback_rules_after_ai_error",
-    "createdAt": "2026-04-29T13:08:27.058Z"
-  },
-  {
-    "id": "pred_rule_1777468128952",
-    "eventId": "evt_opec_001",
-    "asset": "NVDA",
-    "prediction": "Nvidia: bearish bias. Depends on surprise, liquidity, and market context.",
-    "confidence": 0.72,
-    "direction": "bearish",
-    "status": "pending",
-    "source": "fallback_rules_after_ai_error",
-    "createdAt": "2026-04-29T13:08:48.952Z"
-  },
-  {
-    "id": "pred_rule_1777468131377",
-    "eventId": "evt_nvda_earnings_001",
-    "asset": "NVDA",
-    "prediction": "Nvidia: bullish bias. Depends on surprise, liquidity, and market context.",
-    "confidence": 0.68,
-    "direction": "bullish",
-    "status": "pending",
-    "source": "fallback_rules_after_ai_error",
-    "createdAt": "2026-04-29T13:08:51.377Z"
-  },
-  {
-    "id": "pred_rule_1777468135161",
+    "id": "pred_rule_1777469353920",
     "eventId": "live_uae_announces_intention_to_leave_opec_oil_cartel_141458137",
     "asset": "NVDA",
     "prediction": "Nvidia: bullish bias. Depends on surprise, liquidity, and market context.",
@@ -52,6 +8,149 @@
     "direction": "bullish",
     "status": "pending",
     "source": "fallback_rules_after_ai_error",
-    "createdAt": "2026-04-29T13:08:55.161Z"
+    "createdAt": "2026-04-29T13:29:13.920Z"
+  },
+  {
+    "id": "pred_rule_1777469371773",
+    "eventId": "future_political_trade_speech_watch_2",
+    "asset": "NVDA",
+    "prediction": "Nvidia: bearish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.66,
+    "direction": "bearish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T13:29:31.773Z"
+  },
+  {
+    "id": "pred_rule_1777471028547",
+    "eventId": "evt_cpi_us_001",
+    "asset": "GOLD",
+    "prediction": "Gold Spot: bearish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.78,
+    "direction": "bearish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T13:57:08.547Z"
+  },
+  {
+    "id": "pred_rule_1777471033341",
+    "eventId": "evt_geo_risk_001",
+    "asset": "GOLD",
+    "prediction": "Gold Spot: bearish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.78,
+    "direction": "bearish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T13:57:13.341Z"
+  },
+  {
+    "id": "pred_rule_1777471453230",
+    "eventId": "evt_cpi_us_001",
+    "asset": "GOLD",
+    "prediction": "Gold Spot: bearish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.78,
+    "direction": "bearish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T14:04:13.230Z"
+  },
+  {
+    "id": "pred_rule_1777471460564",
+    "eventId": "future_mega_cap_ai_earnings_watch_27",
+    "asset": "GOLD",
+    "prediction": "Gold Spot: bullish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.55,
+    "direction": "bullish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T14:04:20.564Z"
+  },
+  {
+    "id": "pred_rule_1777471474780",
+    "eventId": "evt_cpi_us_001",
+    "asset": "BTC",
+    "prediction": "Bitcoin: bearish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.76,
+    "direction": "bearish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T14:04:34.780Z"
+  },
+  {
+    "id": "pred_rule_1777471497175",
+    "eventId": "future_oil_inventory_shipping_watch_3",
+    "asset": "BTC",
+    "prediction": "Bitcoin: bearish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.72,
+    "direction": "bearish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T14:04:57.175Z"
+  },
+  {
+    "id": "pred_rule_1777471500650",
+    "eventId": "evt_cpi_us_001",
+    "asset": "OIL",
+    "prediction": "Oil: bullish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.74,
+    "direction": "bullish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T14:05:00.650Z"
+  },
+  {
+    "id": "pred_rule_1777472455811",
+    "eventId": "evt_cpi_us_001",
+    "asset": "GOLD",
+    "prediction": "Gold Spot: bearish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.78,
+    "direction": "bearish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T14:20:55.811Z"
+  },
+  {
+    "id": "pred_rule_1777473486807",
+    "eventId": "evt_cpi_us_001",
+    "asset": "GOLD",
+    "prediction": "Gold Spot: bearish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.78,
+    "direction": "bearish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T14:38:06.807Z"
+  },
+  {
+    "id": "pred_rule_1777473490343",
+    "eventId": "future_mega_cap_ai_earnings_watch_27",
+    "asset": "GOLD",
+    "prediction": "Gold Spot: bullish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.55,
+    "direction": "bullish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T14:38:10.343Z"
+  },
+  {
+    "id": "pred_rule_1777476973977",
+    "eventId": "evt_cpi_us_001",
+    "asset": "GOLD",
+    "prediction": "Gold Spot: bearish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.78,
+    "direction": "bearish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T15:36:13.977Z"
+  },
+  {
+    "id": "pred_rule_1777481054623",
+    "eventId": "evt_cpi_us_001",
+    "asset": "GOLD",
+    "prediction": "Gold Spot: bearish bias. Depends on surprise, liquidity, and market context.",
+    "confidence": 0.78,
+    "direction": "bearish",
+    "status": "pending",
+    "source": "fallback_rules_after_ai_error",
+    "createdAt": "2026-04-29T16:44:14.623Z"
   }
 ]

@@ -47,7 +47,9 @@ const els = {
   runTestsBtn: document.querySelector("#runTestsBtn"),
   refreshPricesBtn: document.querySelector("#refreshPricesBtn"),
   generatePredictionBtn: document.querySelector("#generatePredictionBtn"),
-  feedList: document.querySelector("#feedList")
+  feedList: document.querySelector("#feedList"),
+  recentPredictionsContainer: document.querySelector("#recentPredictionsContainer"),
+  selectedPredictionContainer: document.querySelector("#selectedPredictionContainer")
 };
 
 const DEV_MODE = new URLSearchParams(location.search).get("dev") === "1";
@@ -1212,6 +1214,178 @@ function renderReviews() {
   if (els.reviewAvg) els.reviewAvg.textContent = `${average}%`;
 }
 
+async function fetchPredictions() {
+  try {
+    const result = await apiGet("/predictions");
+    return result.data || [];
+  } catch (error) {
+    console.error("Failed to fetch predictions:", error);
+    return [];
+  }
+}
+
+function renderSelectedPrediction(prediction) {
+  if (!els.selectedPredictionContainer) return;
+
+  if (!prediction) {
+    els.selectedPredictionContainer.innerHTML = `
+      <div class="focused-prediction-placeholder">
+        <span class="eyebrow">Focused Prediction</span>
+        <p>No prediction selected — click a card below to preview it here.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const main = predictionMain(prediction);
+  const eventTitle = getEventTitle(prediction.eventId);
+  const sourceLabel = userFacingPredictionSource(prediction.source);
+  const dirClass = main.isBullish ? "bullish" : "bearish";
+
+  els.selectedPredictionContainer.innerHTML = `
+    <article class="card prediction-card focused-prediction-card ${dirClass}">
+      <div class="prediction-headline">
+        <div>
+          <span class="eyebrow">Focused Prediction</span>
+          <h3>${escapeHtml(main.asset)} → ${escapeHtml(eventTitle)}</h3>
+        </div>
+        <span class="badge ${sourceChipClass(prediction.source)}">${escapeHtml(sourceLabel)}</span>
+      </div>
+
+      <div class="prediction-scoreboard">
+        <div class="prediction-big ${main.directionClass}">
+          <span>Direction</span>
+          <strong>${escapeHtml(main.directionLabel)}</strong>
+        </div>
+        <div><span>Confidence</span><strong>${escapeHtml(String(main.confidence))}%</strong></div>
+        <div><span>Status</span><strong>${escapeHtml(prediction.status || "pending")}</strong></div>
+      </div>
+
+      <div class="prediction-quick-grid">
+        <div>
+          <h4>Intelligence summary</h4>
+          <p>${escapeHtml(compact(prediction.prediction || prediction.summary || "Market reaction depends on surprise and liquidity.", 220))}</p>
+          <div class="meta-list prediction-tags">
+            <span>${escapeHtml(main.directionLabel)}</span>
+            <span>${escapeHtml(prediction.status || "pending")}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="prediction-disclaimer">Educational only. Not financial advice.</div>
+    </article>
+  `;
+}
+
+function renderRecentPredictions(predictions) {
+  if (!predictions || predictions.length === 0) {
+    els.recentPredictionsContainer.innerHTML = "";
+    return;
+  }
+
+  const html = predictions.map((prediction, index) => {
+    const confidencePct = Math.round(prediction.confidence * 100);
+    const directionClass = prediction.direction === "bullish" ? "bullish" : "bearish";
+    const directionLabel = prediction.direction === "bullish" ? "Bullish" : "Bearish";
+
+    return `
+      <div class="recent-prediction-card" data-id="${prediction.id}">
+        <div class="recent-prediction-header">
+          <div class="recent-prediction-asset">${escapeHtml(prediction.asset)}</div>
+          <div class="recent-prediction-direction ${directionClass}">${directionLabel}</div>
+        </div>
+        <div class="recent-prediction-summary">${escapeHtml(compact(prediction.prediction, 100))}</div>
+        <div class="recent-prediction-meta">
+          <div class="recent-prediction-confidence">${confidencePct}% confidence</div>
+          <div class="recent-prediction-status">${escapeHtml(prediction.status)}</div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  els.recentPredictionsContainer.innerHTML = html;
+els.recentPredictionsContainer.querySelectorAll(".recent-prediction-card")
+  .forEach((card) => {
+    card.addEventListener("click", () => {
+      const id = card.dataset.id;
+      const prediction = state.predictions.find(p => String(p.id) === String(id));
+      if (!prediction) return;
+
+      // 🔹 Remove active from all
+      els.recentPredictionsContainer
+        .querySelectorAll(".recent-prediction-card")
+        .forEach(c => c.classList.remove("active"));
+
+      // 🔹 Activate clicked
+      card.classList.add("active");
+
+      // 🔹 Update state
+      state.selectedPrediction = prediction;
+      localStorage.setItem("vp_selected_prediction", JSON.stringify(prediction));
+
+      // 🔹 Sync chart
+      state.selectedChartSymbol = prediction.asset;
+      if (els.chartAssetSelect) {
+        els.chartAssetSelect.value = prediction.asset;
+      }
+
+      // 🔹 Render focused view in same tab
+      renderSelectedPrediction(prediction);
+      renderChart();
+
+      // 🔹 Scroll focused card into view
+      els.selectedPredictionContainer?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  
+  });
+}
+function applyActivePredictionCard() {
+  if (!state.selectedPrediction) return;
+  const activeCard = els.recentPredictionsContainer
+    ?.querySelector(`.recent-prediction-card[data-id="${CSS.escape(String(state.selectedPrediction.id))}"]`);
+  activeCard?.classList.add("active");
+}
+
+async function initPredictions() {
+  try {
+    // 1. Use already-loaded dashboard data first (instant render)
+    if (Array.isArray(state.predictions) && state.predictions.length > 0) {
+      renderRecentPredictions(state.predictions);
+    } else {
+      // fallback if dashboard didn’t load predictions
+      const initial = await fetchPredictions();
+      state.predictions = initial;
+      renderRecentPredictions(initial);
+    }
+
+    // Seed focused view from current state (set by loadDashboard before this runs)
+    renderSelectedPrediction(state.selectedPrediction || null);
+    applyActivePredictionCard();
+
+    // 2. Start polling every 10s (single source of truth = state)
+    setInterval(async () => {
+      try {
+        const updatedPredictions = await fetchPredictions();
+
+        if (Array.isArray(updatedPredictions)) {
+          state.predictions = updatedPredictions; // keep state in sync
+          renderRecentPredictions(updatedPredictions);
+          // Re-apply active highlight after list DOM is rebuilt
+          applyActivePredictionCard();
+        } else {
+          console.error("Invalid predictions response:", updatedPredictions);
+        }
+
+      } catch (err) {
+        console.error("Auto-refresh predictions failed:", err);
+      }
+    }, 10000);
+
+  } catch (error) {
+    console.error("initPredictions failed:", error);
+  }
+}
+
 async function checkBackend() {
   try {
     const health = await apiGet("/health");
@@ -1259,6 +1433,7 @@ async function loadDashboard() {
     // ---------------
 
     renderReviews();
+    initPredictions();
     renderChart();
     renderFeedList(feedFilter);
   } catch (error) {
