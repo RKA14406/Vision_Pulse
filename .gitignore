@@ -1,0 +1,26 @@
+# Node
+node_modules/
+
+# Env (CRITICAL)
+.env
+backend/.env
+
+# Local AI / tools
+.claude/
+settings.local.json
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+
+# Build
+dist/
+build/
+
+# Data (optional but recommended)
