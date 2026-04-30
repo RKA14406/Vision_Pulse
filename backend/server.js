@@ -68,14 +68,14 @@ app.get("/api", (req, res) => {
   });
 });
 
-app.use("/api/*", (req, res) => {
+app.use("/api", (req, res) => {
   res.status(404).json({
     success: false,
     message: "API route not found"
   });
 });
 
-app.get("*", (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(FRONTEND_DIR, "index.html"));
 });
 

@@ -55,6 +55,10 @@
             <svg class="tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="2"/></svg>
             <span>Watch</span>
           </button>
+          <button class="tab-btn" data-tab="predictions">
+            <svg class="tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 8 L8 4 L12 8"/><path d="M4 10 L8 14 L12 10"/></svg>
+            <span>Predictions</span>
+          </button>
         </nav>
 
         <span class="sidebar-label">Platform</span>
@@ -102,6 +106,8 @@
                 </div>
               </div>
               <div id="predictionsGrid"></div>
+
+
             </div>
 
             <div class="context-panel">
@@ -221,6 +227,18 @@
             </div>
             <div class="chart-events" id="chartEventsList"></div>
           </section>
+        </div>
+
+        <!-- ── PREDICTIONS ───────────────────────────────────── -->
+        <div class="tab-panel" data-panel="predictions">
+          <div id="selectedPredictionContainer"></div>
+          <div class="section-header">
+            <div>
+              <span class="eyebrow">Recent Activity</span>
+              <h2>Latest Predictions</h2>
+            </div>
+          </div>
+          <div id="recentPredictionsContainer"></div>
         </div>
 
         <!-- ── DEV PANEL (hidden unless ?dev=1) ─────────────── -->
