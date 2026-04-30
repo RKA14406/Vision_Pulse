@@ -1,27 +1,37 @@
-# Recent Predictions Feature
+# Recent Predictions System (v2)
 
 ## 1. Feature Overview
 
-Dynamic display of the latest 10 predictions with auto-refresh functionality.  
-Shows recent AI-generated market predictions in a clean, modern card layout.
+A dynamic prediction history system with **real-time updates** and an **in-place focused view**.
+
+Users can:
+
+* View latest predictions in a dedicated tab
+* Click any prediction to inspect it instantly (no navigation)
+* See a highlighted “Focused Prediction” within the same context
 
 ---
 
 ## 2. Purpose
 
-Previously, users could only see predictions they just generated or from local storage.  
-This feature provides visibility into all recent prediction activity across the system.
+Originally, predictions were only visible after generation or via local storage.
+
+This system introduces:
+
+* A **global prediction history**
+* A **non-disruptive inspection workflow**
+* A more **professional trading-dashboard interaction model**
 
 ---
 
 ## 3. Implementation Summary
 
-| Layer | Change |
-|---|---|
-| frontend/index.html | Added recent predictions section container |
-| frontend/script.js | fetchPredictions(), renderPredictions(), initPredictions() functions |
-| frontend/style.css | Card styling with glassmorphism design |
-| backend API | Reused existing GET /api/predictions endpoint |
+| Layer               | Change                                                                         |
+| ------------------- | ------------------------------------------------------------------------------ |
+| frontend/index.html | Added "Predictions" tab + focused container                                    |
+| frontend/script.js  | Added renderRecentPredictions(), renderSelectedPrediction(), initPredictions() |
+| frontend/style.css  | Enhanced card system + active state + focused card styling                     |
+| backend API         | Reused GET /api/predictions (latest 10, sorted)                                |
 
 ---
 
@@ -30,54 +40,125 @@ This feature provides visibility into all recent prediction activity across the 
 ```
 User loads dashboard
   │
-  ├─ loadDashboard() calls initPredictions()
+  ├─ loadDashboard()
+  │     ├─ Loads predictions into state
+  │     ├─ Restores selectedPrediction from localStorage (if exists)
   │
-  ├─ fetchPredictions() → GET /api/predictions
-  │     ├─ Backend returns last 10 predictions (newest first)
-  │     ├─ Handle empty state gracefully
+  ├─ initPredictions()
+  │     ├─ renderRecentPredictions(state.predictions)
+  │     ├─ setInterval → refresh every 10s
   │
-  ├─ renderPredictions()
-  │     ├─ Create card for each prediction
-  │     ├─ Display asset, direction, summary, confidence, status
-  │     ├─ Color-code bullish/bearish directions
+  ├─ fetchPredictions()
+  │     └─ GET /api/predictions
   │
-  └─ setInterval() auto-refreshes every 10 seconds
+  ├─ renderRecentPredictions()
+  │     ├─ Render list of prediction cards
+  │     ├─ Attach click handlers
+  │
+  └─ On click:
+        ├─ state.selectedPrediction = prediction
+        ├─ Save to localStorage
+        ├─ renderSelectedPrediction()
+        └─ Highlight active card
 ```
 
 ---
 
 ## 5. UI Structure
 
-Each prediction card displays:
+### Predictions Tab Layout
 
-- **Asset**: Uppercase ticker (e.g. "GOLD", "BTC")
-- **Direction**: "Bullish" or "Bearish" with color coding
-- **Summary**: Truncated prediction text (max 100 chars)
-- **Confidence**: Percentage (0-100%)
-- **Status**: Current prediction status ("pending")
+```
+[ Focused Prediction (selectedPredictionContainer) ]
+
+[ Divider ]
+
+[ Prediction History List (recentPredictionsContainer) ]
+```
+
+---
+
+### Prediction Card (List)
+
+* Asset (e.g. GOLD, BTC)
+* Direction (Bullish / Bearish)
+* Summary (truncated)
+* Confidence (%)
+* Status (pending)
+* Clickable (activates focused view)
+
+---
+
+### Focused Prediction (Top Section)
+
+* Larger, highlighted card
+* Full summary
+* Direction + confidence + status
+* Persistent until another selection is made
 
 ---
 
 ## 6. Key Design Decisions
 
-- **Reused backend sorting**: No duplicate sorting logic in frontend
-- **No filtering in frontend**: Backend already limits to 10 predictions
-- **Confidence converted to %**: Display as user-friendly percentage
-- **Color-coded directions**: Green for bullish, red for bearish
-- **Auto-refresh every 10 seconds**: Keeps data current without manual refresh
-- **Empty state handling**: Shows "No predictions yet" when no data
-- **Glassmorphism styling**: Matches existing dashboard aesthetic
-- **Compact layout**: Fits within existing predict panel structure
+* **No page navigation**
+
+  * Uses internal tab system only
+  * Preserves user context
+
+* **In-place drill-down**
+
+  * Click → expand above list
+  * Inspired by trading dashboards (Bloomberg-style)
+
+* **Single source of truth**
+
+  * Uses state.selectedPrediction
+  * Synced with localStorage
+
+* **Backend-driven data**
+
+  * No frontend sorting/filtering duplication
+
+* **Auto-refresh (10s)**
+
+  * Keeps prediction feed live
+
+* **Visual hierarchy**
+
+  * Focused prediction clearly separated from list
+
+* **Active card highlighting**
+
+  * Improves selection clarity
 
 ---
 
-## 7. Limitations (MVP)
+## 7. Improvements Over v1
 
-- No pagination beyond backend's 10 prediction limit
-- No filtering or sorting options
-- No click interactions or drill-down
-- No prediction lifecycle tracking
-- No manual refresh button (auto-only)
-- No error state UI beyond console logging
+* Added dedicated **Predictions tab**
+* Removed dependency on Predict tab for viewing results
+* Introduced **focused prediction preview**
+* Eliminated disruptive navigation
+* Improved UX consistency with dashboard paradigm
 
 ---
+
+## 8. Limitations (Current)
+
+* No pagination beyond 10 predictions
+* No filtering (asset / direction / status)
+* No lifecycle tracking (pending → resolved)
+* No manual refresh control
+* No error-state UI (console only)
+* No backend persistence for "selected" state
+
+---
+
+## 9. Future Enhancements
+
+* Split-view layout (list + detail side-by-side)
+* Prediction accuracy tracking over time
+* Filters (asset, direction, confidence range)
+* Status transitions (pending → correct/incorrect)
+* Manual refresh + loading states
+* WebSocket/live streaming instead of polling
