@@ -277,3 +277,4 @@ VisionPulse AI is an **educational market intelligence prototype**. It does not 
 ## License
 
 This project was built as a hackathon MVP. See repository for license details.
+ 
