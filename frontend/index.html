@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VisionPulse AI</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- ── TOPBAR ──────────────────────────────────────────── -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo-mark">VP</div>
+        <span class="brand-name">VisionPulse <em>AI</em></span>
+      </div>
+
+      <div class="topbar-pills">
+        <span class="sys-pill ok">Server OK</span>
+        <span class="sys-pill ok">AI Connected</span>
+        <span class="sys-pill ok">APIs Active</span>
+      </div>
+
+      <div class="topbar-right">
+        <div class="topbar-stats">
+          <span><strong id="assetCount">--</strong> assets</span>
+          <span><strong id="eventCount">--</strong> events</span>
+          <span><strong id="reviewAvg">--</strong> avg acc</span>
+        </div>
+        <div class="status-pill" id="backendStatus">Checking...</div>
+      </div>
+    </header>
+
+    <!-- ── LAYOUT BODY ─────────────────────────────────────── -->
+    <div class="layout-body">
+
+      <!-- LEFT SIDEBAR -->
+      <aside class="sidebar">
+        <span class="sidebar-label">Navigation</span>
+        <nav class="tab-nav" id="tabNav">
+          <button class="tab-btn active" data-tab="predict">
+            <svg class="tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 11 L6 7 L9 9 L14 4"/><circle cx="14" cy="4" r="1.2" fill="currentColor" stroke="none"/></svg>
+            <span>Predict</span>
+          </button>
+          <button class="tab-btn" data-tab="intel">
+            <svg class="tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M5 7h6M5 9.5h4"/></svg>
+            <span>Intel</span>
+          </button>
+          <button class="tab-btn" data-tab="review">
+            <svg class="tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3.5l2 1.2"/></svg>
+            <span>Review</span>
+          </button>
+          <button class="tab-btn" data-tab="watch">
+            <svg class="tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="2"/></svg>
+            <span>Watch</span>
+          </button>
+          <button class="tab-btn" data-tab="predictions">
+            <svg class="tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 8 L8 4 L12 8"/><path d="M4 10 L8 14 L12 10"/></svg>
+            <span>Predictions</span>
+          </button>
+        </nav>
+
+        <span class="sidebar-label">Platform</span>
+        <div class="sidebar-section">
+          <div class="sidebar-stat-card">
+            <span class="sidebar-stat-label">Version</span>
+            <span class="sidebar-stat-value">v1.0 MVP</span>
+          </div>
+          <div class="sidebar-stat-card">
+            <span class="sidebar-stat-label">AI Model</span>
+            <span class="sidebar-stat-value sidebar-live">Gemini</span>
+          </div>
+          <div class="sidebar-stat-card">
+            <span class="sidebar-stat-label">Mode</span>
+            <span class="sidebar-stat-value">Educational</span>
+          </div>
+          <div class="sidebar-stat-card">
+            <span class="sidebar-stat-label">Disclaimer</span>
+            <span class="sidebar-stat-value sidebar-warn">Not financial advice</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main>
+
+        <!-- ── PREDICT ───────────────────────────────────────── -->
+        <div class="tab-panel active" data-panel="predict">
+          <div class="predict-layout">
+
+            <div class="command-panel">
+              <div class="generator-card" id="generatorCard">
+                <span class="eyebrow">AI Prediction Generator</span>
+                <p class="generator-hint">Pick an event from the feed → select an asset → generate.</p>
+                <div class="generator-form">
+                  <div class="form-row">
+                    <label for="eventSelect">Market Event</label>
+                    <select id="eventSelect"></select>
+                  </div>
+                  <div class="form-row">
+                    <label for="assetSelect">Asset</label>
+                    <select id="assetSelect"></select>
+                  </div>
+                  <button id="generatePredictionBtn">Generate Prediction</button>
+                </div>
+              </div>
+              <div id="predictionsGrid"></div>
+
+
+            </div>
+
+            <div class="context-panel">
+              <div class="feed-header">
+                <span class="eyebrow">Market Intelligence</span>
+                <div class="feed-pills" id="feedPills">
+                  <button class="pill-btn active" data-filter="all">All</button>
+                  <button class="pill-btn" data-filter="future">Soon</button>
+                  <button class="pill-btn" data-filter="past">Past</button>
+                </div>
+              </div>
+              <div class="feed-list" id="feedList">
+                <div class="feed-loading">Loading intelligence feed...</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── INTEL ─────────────────────────────────────────── -->
+        <div class="tab-panel" data-panel="intel">
+          <div class="section-header intelligence-header">
+            <div>
+              <span class="eyebrow">Market Intelligence</span>
+              <h2>Live News + Event Calendar</h2>
+              <p class="section-subtitle">Next-month scheduled events, daily headlines, and key market news.</p>
+            </div>
+            <div class="filters intelligence-controls">
+              <input id="newsQueryInput" type="text" placeholder="Search: Fed, CPI, oil, BTC, gold, Trump..." />
+              <select id="assetFilter" aria-label="Filter feed by asset">
+                <option value="all">All assets</option>
+              </select>
+              <select id="categoryFilter" aria-label="Filter feed by category">
+                <option value="all">All categories</option>
+                <option value="macro">Macro</option>
+                <option value="central_bank">Central Bank</option>
+                <option value="energy">Energy</option>
+                <option value="crypto">Crypto</option>
+                <option value="earnings">Earnings</option>
+                <option value="geopolitical">Geopolitical</option>
+                <option value="live_news">Live News</option>
+                <option value="market_watch">Market Watch</option>
+              </select>
+              <select id="feedTypeFilter" aria-label="Filter feed type">
+                <option value="all">All feed</option>
+                <option value="future">Upcoming</option>
+                <option value="past">Past</option>
+                <option value="calendar">Calendar only</option>
+                <option value="news">News only</option>
+                <option value="small">Small watch</option>
+                <option value="important">Important only</option>
+              </select>
+              <button class="small-btn" id="refreshNewsBtn">Refresh Feed</button>
+            </div>
+          </div>
+          <div class="feed-summary" id="feedSummary">Loading market intelligence feed...</div>
+          <div class="grid news-grid intelligence-feed-grid" id="newsGrid"></div>
+          <p class="section-note">
+            The feed updates from NewsAPI when available and always keeps next-30-day seeded events
+            plus small market-watch cards for demo stability. Any card can be used in the Prediction Generator.
+          </p>
+        </div>
+
+        <!-- ── REVIEW ────────────────────────────────────────── -->
+        <div class="tab-panel" data-panel="review">
+          <div class="section-header">
+            <div>
+              <span class="eyebrow">Accountability Loop</span>
+              <h2>Post-Event Reviews</h2>
+              <p class="section-subtitle">Past calendar and news items receive MVP accuracy review cards.</p>
+            </div>
+          </div>
+          <div class="grid review-grid" id="reviewsGrid"></div>
+        </div>
+
+        <!-- ── WATCH ─────────────────────────────────────────── -->
+        <div class="tab-panel" data-panel="watch">
+          <div class="section-header">
+            <div>
+              <span class="eyebrow">Market Layer</span>
+              <h2>Asset Watchlist</h2>
+            </div>
+            <button class="small-btn" id="refreshPricesBtn">Refresh Prices</button>
+          </div>
+          <div class="grid cards-grid" id="assetsGrid"></div>
+
+          <div class="section-header" style="margin-top:32px">
+            <div>
+              <span class="eyebrow">Visual Layer</span>
+              <h2>Chart View</h2>
+              <p class="section-subtitle">Markers show important past news and upcoming events for the selected asset.</p>
+            </div>
+            <div class="filters">
+              <select id="chartAssetSelect" aria-label="Select chart asset"></select>
+              <button class="small-btn" id="refreshChartBtn">Redraw</button>
+            </div>
+          </div>
+          <section class="chart-panel">
+            <div class="chart-info">
+              <div>
+                <span class="eyebrow">Selected Asset</span>
+                <h3 id="chartAssetTitle">Select an asset</h3>
+                <p id="chartAssetSubtitle">Seeded/mock line chart with live quote overlay when available.</p>
+              </div>
+              <div class="chart-metrics">
+                <div><strong id="chartPrice">--</strong><span>Latest Price</span></div>
+                <div><strong id="chartChange">--</strong><span>Change</span></div>
+                <div><strong id="chartSource">--</strong><span>Source</span></div>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas id="assetChartCanvas" height="320"></canvas>
+            </div>
+            <div class="chart-footnote">
+              <span id="chartLastUpdated">Last updated: --</span>
+              <span id="chartMode">Mode: seeded chart points</span>
+            </div>
+            <div class="chart-events" id="chartEventsList"></div>
+          </section>
+        </div>
+
+        <!-- ── PREDICTIONS ───────────────────────────────────── -->
+        <div class="tab-panel" data-panel="predictions">
+          <div id="selectedPredictionContainer"></div>
+          <div class="section-header">
+            <div>
+              <span class="eyebrow">Recent Activity</span>
+              <h2>Latest Predictions</h2>
+            </div>
+          </div>
+          <div id="recentPredictionsContainer"></div>
+        </div>
+
+        <!-- ── DEV PANEL (hidden unless ?dev=1) ─────────────── -->
+        <div class="dev-panel" id="devPanel" style="display:none">
+          <div class="section-header">
+            <div>
+              <span class="eyebrow">Trust Layer</span>
+              <h2>API Status</h2>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="small-btn" id="refreshApiStatusBtn">Refresh API Status</button>
+              <button class="small-btn" id="reloadDashboardBtn">Reload Dashboard</button>
+              <button class="small-btn" id="runTestsBtn">Run Endpoint Tests</button>
+            </div>
+          </div>
+          <div class="grid api-status-grid" id="apiStatusGrid"></div>
+          <div class="section-header" style="margin-top:24px">
+            <div><span class="eyebrow">API Checks</span><h2>Testing Console</h2></div>
+          </div>
+          <div class="console" id="testConsole">Click "Run Endpoint Tests" to verify backend routes.</div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
